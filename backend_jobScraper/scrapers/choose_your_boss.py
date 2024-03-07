@@ -8,7 +8,7 @@ from db.database import insert_job_offer_into_db
 
 class FreeWorkFr(BaseScraper):
     def __init__(self, driver):
-        super().__init__('https://www.free-work.com/fr/tech-it/jobs') 
+        super().__init__('https://www.chooseyourboss.com/offres/emploi-it') 
         self.driver = driver 
 
     def scrape_jobs(self):
@@ -27,7 +27,7 @@ class FreeWorkFr(BaseScraper):
 
     def _wait_for_job_elements(self):
         WebDriverWait(self.driver, 10).until(
-            EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div.px-4.pb-4.flex.flex-col.h-full'))
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div.col-md-8.col-xs-12 '))
         )
 
 
@@ -44,7 +44,7 @@ class FreeWorkFr(BaseScraper):
             print(f"Impossible d'ouvrir l'URL de l'offre d'emploi : {e}")
 
     def _scrape_current_page(self):
-        job_offers = self.driver.find_elements(By.CSS_SELECTOR, 'div.px-4.pb-4.flex.flex-col.h-full')
+        job_offers = self.driver.find_elements(By.CSS_SELECTOR, 'div.col-md-8.col-xs-12 ')
         for job in job_offers:
             try:
                 location = self._get_element_text(job, 'span.block.flex-1')
@@ -97,4 +97,4 @@ class FreeWorkFr(BaseScraper):
             return False
 
 
-        
+    

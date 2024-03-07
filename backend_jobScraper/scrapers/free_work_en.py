@@ -59,11 +59,11 @@ class FreeWorkEn(BaseScraper):
                 title = self._get_element_text(job_details, 'p.text-xl.font-semibold')
                 company = self._get_element_text(job_details, 'p.font-semibold')
                 description = self._get_element_text(job_details, 'div.html-renderer.prose-content')
-                job_type = "Freelance"
+                job_type = self._get_element_text(job_details, 'div.tags div.truncate')
                 unique_id = hashlib.md5((title + company).encode('utf-8')).hexdigest()
 
                 # Imprimer les détails de l'offre
-                print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nDescription: {description}\n{"-"*20}')
+                print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nDescription: {description}\n{"-"*20}')
 
                 # Insérer les détails de l'offre dans la base de données
                 insert_job_offer_into_db(title, company, location, job_type, description, unique_id)

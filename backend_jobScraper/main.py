@@ -1,4 +1,4 @@
-from backend_jobScraper.scrapers.free_work_eng import FreeWorkEn
+from backend_jobScraper.scrapers.free_work_en import FreeWorkEn
 from backend_jobScraper.scrapers.free_work_fr import FreeWorkFr 
 
 def main():

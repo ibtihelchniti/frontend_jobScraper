@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from scrapers.free_work_eng import FreeWorkEn
+from scrapers.free_work_en import FreeWorkEn
 from scrapers.free_work_fr import FreeWorkFr
 from utils.webdriver import init_webdriver
 from db.database import insert_scraping_history

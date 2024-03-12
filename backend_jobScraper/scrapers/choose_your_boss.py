@@ -27,13 +27,11 @@ class ChooseYourBoss(BaseScraper):
 
     def _wait_for_job_elements(self):
         WebDriverWait(self.driver, 10).until(
-            EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div.col-md-8.col-xs-12 '))
-        )
-
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div.col-md-8.col-xs-12 > div.card.offer')))
 
     def _click_view_job_button(self, job_element):
         try:
-            # Récupérer le lien de l'offre d'emploi depuis le titre
+            # Récupérer l'URL de l'offre d'emploi
             job_url = job_element.find_element(By.CSS_SELECTOR, '.offer__title.top a').get_attribute('href')
             # Ouvrir l'URL dans une nouvelle fenêtre
             self.driver.execute_script(f"window.open('{job_url}','_blank');")
@@ -43,55 +41,51 @@ class ChooseYourBoss(BaseScraper):
         except Exception as e:
             print(f"Impossible d'ouvrir l'URL de l'offre d'emploi : {e}")
 
-
     def _scrape_current_page(self):
-        job_offers = self.driver.find_elements(By.CSS_SELECTOR, 'div.col-md-8.col-xs-12 ')
-        for job in job_offers:
-            try:
-                self._click_view_job_button(job)  # Ouvre la page d'offre d'emploi dans une nouvelle fenêtre
-                
-                # Attendre que la page de détails de l'offre soit chargée
-                WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ' div.well > div')))
-                
-                # Scraper les détails de l'offre
-                job_details = self.driver.find_element(By.CSS_SELECTOR, 'div.container-fluid')
-                title = self._get_element_text(job_details, 'div.headline > h1')
-                company = self._get_element_text(job_details, 'div.headline > div > a')
-                job_type = self._get_element_text(job_details, 'div.details > ul > li:nth-child(1)')
-                location = self._get_element_text(job_details, 'div.details > ul > li:nth-child(4)')
+        while True:
+            job_offers = self.driver.find_elements(By.CSS_SELECTOR, 'div.col-md-8.col-xs-12 > div.card.offer ')
+            for job in job_offers:
+                try:
+                    self._click_view_job_button(job)  # Ouvre la page d'offre d'emploi dans une nouvelle fenêtre
+                    
+                    # Attendre que la page de détails de l'offre soit chargée
+                    WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ' div.well > div')))
+                    
+                    # Scraper les détails de l'offre
+                    job_details = self.driver.find_element(By.CSS_SELECTOR, 'div.container-fluid')
+                    title = self._get_element_text(job_details, 'div.headline > h1')
+                    company = self._get_element_text(job_details, 'div.headline > div > a')
+                    job_type = self._get_element_text(job_details, 'div.details > ul > li:nth-child(1)')
+                    location = self._get_element_text(job_details, 'div.details > ul > li:nth-child(4)')
 
-                job_description = self.driver.find_element(By.CSS_SELECTOR, 'div.col-xs-12.col-md-8')
-                description = self._get_element_text(job_description, 'div.well > div')
+                    job_description = self.driver.find_element(By.CSS_SELECTOR, 'div.col-xs-12.col-md-8')
+                    description = self._get_element_text(job_description, 'div.well > div')
 
-                unique_id = hashlib.md5((title + company).encode('utf-8')).hexdigest()
+                    unique_id = hashlib.md5((title + company).encode('utf-8')).hexdigest()
 
-                # Imprimer les détails de l'offre
-                print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nDescription: {description}\n{"-"*20}')
+                    # Imprimer les détails de l'offre
+                    print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nDescription: {description}\n{"-"*20}')
 
-                # Insérer les détails de l'offre dans la base de données
-                insert_job_offer_into_db(title, company, location, job_type, description, unique_id)
+                    # Insérer les détails de l'offre dans la base de données
+                    insert_job_offer_into_db(title, company, location, job_type, description, unique_id)
 
-            except Exception as e:
-                print(f"Erreur lors du scraping de cette offre : {e}")
-                
-            finally:
-                # Fermer la fenêtre actuelle et revenir à la fenêtre précédente
-                if len(self.driver.window_handles) > 1:
-                    self.driver.close()
-                    self.driver.switch_to.window(self.driver.window_handles[0])
-                time.sleep(3)  # Attendre que la page se recharge
+                except Exception as e:
+                    print(f"Erreur lors du scraping de cette offre : {e}")
+                    
+                finally:
+                    # Fermer la fenêtre actuelle et revenir à la fenêtre précédente
+                    if len(self.driver.window_handles) > 1:
+                        self.driver.close()
+                        self.driver.switch_to.window(self.driver.window_handles[0])
+                    time.sleep(3)  # Attendre que la page se recharge
 
-
-    def _get_element_text(self, parent_element, css_selector, default="-"):
-        try:
-            return parent_element.find_element(By.CSS_SELECTOR, css_selector).text.strip()
-        except:
-            return default
+            if not self._go_to_next_page():
+                break
 
     def _go_to_next_page(self):
         try:
             next_button = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, 'a[data-page][href*="page="]:not([disabled])'))
+                EC.element_to_be_clickable((By.CSS_SELECTOR, 'ul.pagination li:last-child a[rel="next"]'))
             )
             next_button.click()
             time.sleep(3)
@@ -101,4 +95,10 @@ class ChooseYourBoss(BaseScraper):
             return False
 
 
+
+    def _get_element_text(self, parent_element, css_selector, default="-"):
+        try:
+            return parent_element.find_element(By.CSS_SELECTOR, css_selector).text.strip()
+        except:
+            return default
     

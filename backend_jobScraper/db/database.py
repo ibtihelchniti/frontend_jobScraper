@@ -17,7 +17,7 @@ def insert_job_offer_into_db(title, company, location, job_type, description, un
         existing_post = cursor.fetchone()
         if existing_post:
             post_id = existing_post[0]
-        else:
+        else: 
             # Insérer l'offre d'emploi dans la table wp_posts
             query = ("""
                 INSERT INTO wp_posts (post_author, post_date, post_date_gmt, post_content, post_title, post_excerpt, 
@@ -33,9 +33,7 @@ def insert_job_offer_into_db(title, company, location, job_type, description, un
             update_postmeta(cursor, post_id, '_application', 'candidature@elzei.fr')
             update_postmeta(cursor, post_id, '_job_location', location)
             update_postmeta(cursor, post_id, '_company_name', company)
-
-        # Ajouter le type d'emploi aux métadonnées de l'offre
-        update_postmeta(cursor, post_id, '_job_type', job_type)
+            update_postmeta(cursor, post_id, '_job_type', job_type)
 
         # Valider la transaction
         conn.commit() 
@@ -49,14 +47,10 @@ def insert_job_offer_into_db(title, company, location, job_type, description, un
                 cursor.close()
             conn.close()
 
-
-
 def get_term_taxonomy_id(cursor, job_type):
     cursor.execute("SELECT term_taxonomy_id FROM wp_term_taxonomy WHERE term_id IN (SELECT term_id FROM wp_terms WHERE name = %s)", (job_type,))
     row = cursor.fetchone()
     return row[0] if row else None
-
-
 
 def update_postmeta(cursor, post_id, meta_key, meta_value):
     query = ("""

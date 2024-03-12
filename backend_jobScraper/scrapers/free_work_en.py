@@ -1,4 +1,3 @@
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -79,6 +78,11 @@ class FreeWorkEn(BaseScraper):
                 time.sleep(3)  # Attendre que la page se recharge
 
 
+    def _get_element_text(self, parent_element, css_selector, default="-"):
+        try:
+            return parent_element.find_element(By.CSS_SELECTOR, css_selector).text.strip()
+        except:
+            return default
 
     def _go_to_next_page(self):
         try:
@@ -92,9 +96,3 @@ class FreeWorkEn(BaseScraper):
             print(f"Impossible de passer à la page suivante : {e}")
             return False
 
-
-    def _get_element_text(self, parent_element, css_selector, default="-"):
-        try:
-            return parent_element.find_element(By.CSS_SELECTOR, css_selector).text.strip()
-        except:
-            return default

@@ -6,7 +6,7 @@ import hashlib
 from .base_scraper import BaseScraper
 from db.database import insert_job_offer_into_db
 
-class FreeWorkFr(BaseScraper):
+class ChooseYourBoss(BaseScraper):
     def __init__(self, driver):
         super().__init__('https://www.chooseyourboss.com/offres/emploi-it') 
         self.driver = driver 
@@ -33,8 +33,8 @@ class FreeWorkFr(BaseScraper):
 
     def _click_view_job_button(self, job_element):
         try:
-            # Récupérer l'URL de l'offre d'emploi
-            job_url = job_element.find_element(By.CSS_SELECTOR, 'a').get_attribute('href')
+            # Récupérer le lien de l'offre d'emploi depuis le titre
+            job_url = job_element.find_element(By.CSS_SELECTOR, '.offer__title.top a').get_attribute('href')
             # Ouvrir l'URL dans une nouvelle fenêtre
             self.driver.execute_script(f"window.open('{job_url}','_blank');")
             # Passer à la nouvelle fenêtre
@@ -43,22 +43,26 @@ class FreeWorkFr(BaseScraper):
         except Exception as e:
             print(f"Impossible d'ouvrir l'URL de l'offre d'emploi : {e}")
 
+
     def _scrape_current_page(self):
         job_offers = self.driver.find_elements(By.CSS_SELECTOR, 'div.col-md-8.col-xs-12 ')
         for job in job_offers:
             try:
-                location = self._get_element_text(job, 'span.block.flex-1')
                 self._click_view_job_button(job)  # Ouvre la page d'offre d'emploi dans une nouvelle fenêtre
                 
                 # Attendre que la page de détails de l'offre soit chargée
-                WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.html-renderer.prose-content')))
+                WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ' div.well > div')))
                 
                 # Scraper les détails de l'offre
-                job_details = self.driver.find_element(By.CSS_SELECTOR, 'div.w-full.mx-auto.px-4.md\:px-8.py-4.bg-dot.flex-1')
-                title = self._get_element_text(job_details, 'p.text-xl.font-semibold')
-                company = self._get_element_text(job_details, 'p.font-semibold')
-                description = self._get_element_text(job_details, 'div.html-renderer.prose-content')
-                job_type = self._get_element_text(job_details, 'div.tags div.truncate')
+                job_details = self.driver.find_element(By.CSS_SELECTOR, 'div.container-fluid')
+                title = self._get_element_text(job_details, 'div.headline > h1')
+                company = self._get_element_text(job_details, 'div.headline > div > a')
+                job_type = self._get_element_text(job_details, 'div.details > ul > li:nth-child(1)')
+                location = self._get_element_text(job_details, 'div.details > ul > li:nth-child(4)')
+
+                job_description = self.driver.find_element(By.CSS_SELECTOR, 'div.col-xs-12.col-md-8')
+                description = self._get_element_text(job_description, 'div.well > div')
+
                 unique_id = hashlib.md5((title + company).encode('utf-8')).hexdigest()
 
                 # Imprimer les détails de l'offre

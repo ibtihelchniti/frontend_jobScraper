@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from scrapers.free_work_en import FreeWorkEn
 from scrapers.free_work_fr import FreeWorkFr
+from scrapers.choose_your_boss import ChooseYourBoss
 from utils.webdriver import init_webdriver
 from db.database import insert_scraping_history
 import mysql.connector
@@ -45,6 +46,21 @@ def scrape_jobs_fr():
         insert_scraping_history(datetime.now(), "Failed", "https://www.free-work.com/fr/tech-it/jobs") 
         return jsonify({"success": False, "message": str(e)})
 
+@app.route('/scrape-ch', methods=['GET'])
+def scrape_jobs_ch():
+    try:
+        driver = init_webdriver()
+        scraper_ch = ChooseYourBoss(driver)
+        scraper_ch.scrape_jobs()
+        
+        # Insérer les données dans la base de données pour succès
+        insert_scraping_history(datetime.now(), "Success", "https://www.chooseyourboss.com/offres/emploi-it")  
+        
+        return jsonify({"success": True, "message": "Scraping terminé avec succès pour free work fr."})
+    except Exception as e:
+        # En cas d'erreur, insérer l'échec dans la base de données
+        insert_scraping_history(datetime.now(), "Failed", "https://www.chooseyourboss.com/offres/emploi-it") 
+        return jsonify({"success": False, "message": str(e)})
     
 
 @app.route('/scraping-history', methods=['GET'])

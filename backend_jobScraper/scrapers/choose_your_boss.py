@@ -56,6 +56,8 @@ class ChooseYourBoss(BaseScraper):
                     title = self._get_element_text(job_details, 'div.headline > h1')
                     company = self._get_element_text(job_details, 'div.headline > div > a')
                     job_type = self._get_element_text(job_details, 'div.details > ul > li:nth-child(1)')
+                    salary = self._get_element_text(job_details, 'div.details > ul > li:nth-child(2)')
+                    experience = self._get_element_text(job_details, 'div.details > ul > li:nth-child(3)')
                     location = self._get_element_text(job_details, 'div.details > ul > li:nth-child(4)')
 
                     job_description = self.driver.find_element(By.CSS_SELECTOR, 'div.col-xs-12.col-md-8')
@@ -64,10 +66,10 @@ class ChooseYourBoss(BaseScraper):
                     unique_id = hashlib.md5((title + company).encode('utf-8')).hexdigest()
 
                     # Imprimer les détails de l'offre
-                    print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nDescription: {description}\n{"-"*20}')
+                    print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nSalaire: {salary}\nExpérience nécessaire: {experience}\nDescription: {description}\n{"-"*20}')
 
                     # Insérer les détails de l'offre dans la base de données
-                    insert_job_offer_into_db(title, company, location, job_type, description, unique_id)
+                    insert_job_offer_into_db(title, company, location, job_type, salary, experience, description, unique_id)
 
                 except Exception as e:
                     print(f"Erreur lors du scraping de cette offre : {e}")

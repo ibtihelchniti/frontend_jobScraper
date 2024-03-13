@@ -1,6 +1,6 @@
 import mysql.connector
 
-def insert_job_offer_into_db(title, company, location, job_type, description, unique_id):
+def insert_job_offer_into_db(title, company, location, job_type, salary, experience, description, unique_id):
     conn = None
     try:
         conn = mysql.connector.connect(
@@ -34,6 +34,8 @@ def insert_job_offer_into_db(title, company, location, job_type, description, un
             update_postmeta(cursor, post_id, '_job_location', location)
             update_postmeta(cursor, post_id, '_company_name', company)
             update_postmeta(cursor, post_id, '_job_type', job_type)
+            update_postmeta(cursor, post_id, '_salary', salary)
+            update_postmeta(cursor, post_id, '_experience_years', experience)
 
         # Valider la transaction
         conn.commit() 

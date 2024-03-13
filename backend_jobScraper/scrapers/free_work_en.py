@@ -61,11 +61,22 @@ class FreeWorkEn(BaseScraper):
                 job_type = self._get_element_text(job_details, 'div.tags div.truncate')
                 unique_id = hashlib.md5((title + company).encode('utf-8')).hexdigest()
 
+                salary = None
+                experience = None
+                list_items = job_details.find_elements(By.CSS_SELECTOR, 'div.grid > div.flex.items-center.py-1')
+
+                for item in list_items:
+                    text = self._get_element_text(item, 'span.text-sm.line-clamp-2')  
+                    if '£' in text or '⁄day' in text:  
+                        salary = text
+                    elif 'years' in text or 'experience' in text: 
+                        experience = text
+
                 # Imprimer les détails de l'offre
-                print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nDescription: {description}\n{"-"*20}')
+                print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nSalaire: {salary}\nExpérience nécessaire: {experience}\nDescription: {description}\n{"-"*20}')
 
                 # Insérer les détails de l'offre dans la base de données
-                insert_job_offer_into_db(title, company, location, job_type, description, unique_id)
+                insert_job_offer_into_db(title, company, location, job_type, salary, experience, description, unique_id)
 
             except Exception as e:
                 print(f"Erreur lors du scraping de cette offre : {e}")

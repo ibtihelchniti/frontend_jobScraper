@@ -51,15 +51,22 @@ class FreeWorkFr(BaseScraper):
                 self._click_view_job_button(job)  # Ouvre la page d'offre d'emploi dans une nouvelle fenêtre
                 
                 # Attendre que la page de détails de l'offre soit chargée
-                WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.html-renderer.prose-content')))
+                WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.flex.flex-col.gap-4')))
                 
                 # Scraper les détails de l'offre
                 job_details = self.driver.find_element(By.CSS_SELECTOR, 'div.w-full.mx-auto.px-4.md\:px-8.py-4.bg-dot.flex-1')
                 title = self._get_element_text(job_details, 'p.text-xl.font-semibold')
                 company = self._get_element_text(job_details, 'p.font-semibold')
-                description = self._get_element_text(job_details, 'div.html-renderer.prose-content')
                 job_type = self._get_element_text(job_details, 'div.tags div.truncate')
                 unique_id = hashlib.md5((title + company).encode('utf-8')).hexdigest()
+
+
+                # Scraper la description de l'offre tout en conservant la mise en forme
+                description_elements = job_details.find_elements(By.CSS_SELECTOR, 'div.html-renderer.prose-content p')
+                description = '\n\n\n'.join([element.get_attribute('innerHTML') for element in description_elements])
+
+                logo_element = job.find_element(By.CSS_SELECTOR, 'div.flex-wrap > a > img')
+                logo_url = logo_element.get_attribute('src')
 
                 salary = None
                 experience = None
@@ -67,7 +74,7 @@ class FreeWorkFr(BaseScraper):
 
                 for item in list_items:
                     text = self._get_element_text(item, 'span.text-sm.line-clamp-2')
-                    if '€' in text or '⁄j' in text or '⁄an' in text:  
+                    if '€' in text or '€/j' in text or '€/an' in text or 'k' in text:  
                         salary = text
                     elif 'ans' in text or 'expérience' in text: 
                         experience = text
@@ -76,7 +83,7 @@ class FreeWorkFr(BaseScraper):
                 print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nSalaire: {salary}\nExpérience nécessaire: {experience}\nDescription: {description}\n{"-"*20}')
 
                 # Insérer les détails de l'offre dans la base de données
-                insert_job_offer_into_db(title, company, location, job_type, salary, experience, description, unique_id)
+                insert_job_offer_into_db(title, company, location, job_type, logo_url, salary, experience, description, unique_id)
 
             except Exception as e:
                 print(f"Erreur lors du scraping de cette offre : {e}")
@@ -87,6 +94,7 @@ class FreeWorkFr(BaseScraper):
                     self.driver.close()
                     self.driver.switch_to.window(self.driver.window_handles[0])
                 time.sleep(3)  # Attendre que la page se recharge
+
 
 
     def _get_element_text(self, parent_element, css_selector, default="-"):

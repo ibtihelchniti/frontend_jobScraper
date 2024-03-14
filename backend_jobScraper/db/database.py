@@ -1,6 +1,6 @@
 import mysql.connector
 
-def insert_job_offer_into_db(title, company, location, job_type, salary, experience, description, unique_id):
+def insert_job_offer_into_db(title, company, location, job_type, logo_url, salary, experience, description, unique_id):
     conn = None
     try:
         conn = mysql.connector.connect(
@@ -33,9 +33,10 @@ def insert_job_offer_into_db(title, company, location, job_type, salary, experie
             update_postmeta(cursor, post_id, '_application', 'candidature@elzei.fr')
             update_postmeta(cursor, post_id, '_job_location', location)
             update_postmeta(cursor, post_id, '_company_name', company)
-            update_postmeta(cursor, post_id, '_job_type', job_type)
-            update_postmeta(cursor, post_id, '_salary', salary)
+            update_postmeta(cursor, post_id, '_job_listing_type', job_type)
+            update_postmeta(cursor, post_id, '_job_salary', salary)
             update_postmeta(cursor, post_id, '_experience_years', experience)
+            update_postmeta(cursor, post_id, '_thumbnail_id', logo_url)
 
         # Valider la transaction
         conn.commit() 
@@ -54,6 +55,7 @@ def get_term_taxonomy_id(cursor, job_type):
     row = cursor.fetchone()
     return row[0] if row else None
 
+
 def update_postmeta(cursor, post_id, meta_key, meta_value):
     query = ("""
         INSERT INTO wp_postmeta (post_id, meta_key, meta_value) 
@@ -62,6 +64,7 @@ def update_postmeta(cursor, post_id, meta_key, meta_value):
         meta_value = VALUES(meta_value)
     """)
     cursor.execute(query, (post_id, meta_key, meta_value))
+
 
 def add_job_to_term_relationships(cursor, post_id, term_taxonomy_id):
     query = """

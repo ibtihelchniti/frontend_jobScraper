@@ -57,9 +57,19 @@ class FreeWorkEn(BaseScraper):
                 job_details = self.driver.find_element(By.CSS_SELECTOR, 'div.w-full.mx-auto.px-4.md\:px-8.py-4.bg-dot.flex-1')
                 title = self._get_element_text(job_details, 'p.text-xl.font-semibold')
                 company = self._get_element_text(job_details, 'p.font-semibold')
-                description = self._get_element_text(job_details, 'div.html-renderer.prose-content')
                 job_type = self._get_element_text(job_details, 'div.tags div.truncate')
                 unique_id = hashlib.md5((title + company).encode('utf-8')).hexdigest()
+                
+                description_elements = job_details.find_elements(By.CSS_SELECTOR, 'div.html-renderer.prose-content p')
+                description = '\n\n\n'.join([element.get_attribute('innerHTML') for element in description_elements])
+
+                # Scraper l'URL du logo de l'offre si l'élément est présent
+                logo_elements = job_details.find_elements(By.CSS_SELECTOR, 'div.flex > a > img')
+                if logo_elements:
+                    logo_url = logo_elements[0].get_attribute('src')
+                else:
+                    logo_url = None
+
 
                 salary = None
                 experience = None
@@ -73,10 +83,10 @@ class FreeWorkEn(BaseScraper):
                         experience = text
 
                 # Imprimer les détails de l'offre
-                print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nSalaire: {salary}\nExpérience nécessaire: {experience}\nDescription: {description}\n{"-"*20}')
+                print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nLogo: {logo_url}\nSalaire: {salary}\nExpérience nécessaire: {experience}\nDescription: {description}\n{"-"*20}')
 
                 # Insérer les détails de l'offre dans la base de données
-                insert_job_offer_into_db(title, company, location, job_type, salary, experience, description, unique_id)
+                insert_job_offer_into_db(title, company, location, job_type, logo_url, salary, experience, description, unique_id)
 
             except Exception as e:
                 print(f"Erreur lors du scraping de cette offre : {e}")

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, send_file
 from flask_cors import CORS
 from scrapers.free_work_en import FreeWorkEn
 from scrapers.free_work_fr import FreeWorkFr
@@ -7,6 +7,7 @@ from utils.webdriver import init_webdriver
 from db.database import insert_scraping_history
 import mysql.connector
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -104,6 +105,7 @@ def get_scraping_history():
             if cursor:
                 cursor.close()
             conn.close()
+
     
 if __name__ == '__main__':
     app.run(debug=True)

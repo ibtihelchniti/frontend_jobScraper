@@ -65,8 +65,12 @@ class FreeWorkFr(BaseScraper):
                 description_elements = job_details.find_elements(By.CSS_SELECTOR, 'div.html-renderer.prose-content p')
                 description = '\n\n\n'.join([element.get_attribute('innerHTML') for element in description_elements])
 
-                logo_element = job.find_element(By.CSS_SELECTOR, 'div.flex-wrap > a > img')
-                logo_url = logo_element.get_attribute('src')
+                # Scraper l'URL du logo de l'offre si l'élément est présent
+                logo_elements = job_details.find_elements(By.CSS_SELECTOR, 'div.flex > a > img')
+                if logo_elements:
+                    logo_url = logo_elements[0].get_attribute('src')
+                else:
+                    logo_url = None
 
                 salary = None
                 experience = None
@@ -80,7 +84,7 @@ class FreeWorkFr(BaseScraper):
                         experience = text
 
                 # Imprimer les détails de l'offre
-                print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nSalaire: {salary}\nExpérience nécessaire: {experience}\nDescription: {description}\n{"-"*20}')
+                print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nLogo: {logo_url}\nSalaire: {salary}\nExpérience nécessaire: {experience}\nDescription: {description}\n{"-"*20}')
 
                 # Insérer les détails de l'offre dans la base de données
                 insert_job_offer_into_db(title, company, location, job_type, logo_url, salary, experience, description, unique_id)

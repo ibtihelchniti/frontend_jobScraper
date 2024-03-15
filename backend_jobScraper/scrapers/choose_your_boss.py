@@ -61,17 +61,19 @@ class ChooseYourBoss(BaseScraper):
                     location = self._get_element_text(job_details, 'div.details > ul > li:nth-child(4)')
 
                     job_description = self.driver.find_element(By.CSS_SELECTOR, 'div.col-xs-12.col-md-8')
-
                     description_elements = job_description.find_elements(By.CSS_SELECTOR, 'div.well > div')
                     description = '\n\n\n'.join([element.get_attribute('innerHTML') for element in description_elements])
 
-                    logo_element = job.find_element(By.CSS_SELECTOR, 'div.flex-wrap > a > img')
-                    logo_url = logo_element.get_attribute('src')
+                    logo_elements = self.driver.find_elements(By.CSS_SELECTOR, 'div.thumbnail.thumbnail-xl.thumbnail--light > img.img-responsive')
+                    if logo_elements:
+                        logo_url = logo_elements[0].get_attribute('src')
+                    else:
+                        logo_url = None
 
                     unique_id = hashlib.md5((title + company).encode('utf-8')).hexdigest()
 
                     # Imprimer les détails de l'offre
-                    print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nSalaire: {salary}\nExpérience nécessaire: {experience}\nDescription: {description}\n{"-"*20}')
+                    print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nLogo: {logo_url}\nSalaire: {salary}\nExpérience nécessaire: {experience}\nDescription: {description}\n{"-"*20}')
 
                     # Insérer les détails de l'offre dans la base de données
                     insert_job_offer_into_db(title, company, location, job_type, logo_url, salary, experience, description, unique_id)

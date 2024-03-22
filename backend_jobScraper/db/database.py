@@ -17,6 +17,8 @@ def insert_job_offer_into_db(title, company, location, job_type, logo_url, salar
         existing_post = cursor.fetchone()
         if existing_post:
             post_id = existing_post[0]
+            print(f"L'offre d'emploi '{title}' existe déjà dans la base de données.")
+            return  
         else: 
             # Insérer l'offre d'emploi dans la table wp_posts
             query = ("""
@@ -33,10 +35,13 @@ def insert_job_offer_into_db(title, company, location, job_type, logo_url, salar
             update_postmeta(cursor, post_id, '_application', 'candidature@elzei.fr')
             update_postmeta(cursor, post_id, '_job_location', location)
             update_postmeta(cursor, post_id, '_company_name', company)
-            update_postmeta(cursor, post_id, '_job_type', job_type)
             update_postmeta(cursor, post_id, '_job_salary', salary)
             update_postmeta(cursor, post_id, '_experience_years', experience)
-            update_postmeta(cursor, post_id, '_thumbnail_id', logo_url)
+            update_postmeta(cursor, post_id, '_job_type', job_type)
+            update_postmeta(cursor, post_id, '_logo_url', logo_url)
+
+            attachment_id = get_attachment_id_from_url(cursor, logo_url)
+            update_postmeta(cursor, post_id, '_thumbnail_id', attachment_id)
 
         # Valider la transaction
         conn.commit() 
@@ -50,11 +55,27 @@ def insert_job_offer_into_db(title, company, location, job_type, logo_url, salar
                 cursor.close()
             conn.close()
 
+def get_attachment_id_from_url(cursor, logo_url):
+    cursor.execute("SELECT ID FROM wp_posts WHERE guid = %s", (logo_url,))
+    row = cursor.fetchone()
+    return row[0] if row else None
+
+def get_post_id_by_unique_id(cursor, unique_id):
+    cursor.execute("SELECT ID FROM wp_posts WHERE post_name = %s", (unique_id,))
+    row = cursor.fetchone()
+    return row[0] if row else None
+
 def get_term_taxonomy_id(cursor, job_type):
     cursor.execute("SELECT term_taxonomy_id FROM wp_term_taxonomy WHERE term_id IN (SELECT term_id FROM wp_terms WHERE name = %s)", (job_type,))
     row = cursor.fetchone()
     return row[0] if row else None
 
+def add_job_to_term_relationships(cursor, post_id, term_id):
+    query = """
+        INSERT INTO wp_term_relationships (object_id, term_taxonomy_id)
+        VALUES (%s, %s)
+    """
+    cursor.execute(query, (post_id, term_id))
 
 def update_postmeta(cursor, post_id, meta_key, meta_value):
     query = ("""
@@ -64,14 +85,6 @@ def update_postmeta(cursor, post_id, meta_key, meta_value):
         meta_value = VALUES(meta_value)
     """)
     cursor.execute(query, (post_id, meta_key, meta_value))
-
-
-def add_job_to_term_relationships(cursor, post_id, term_taxonomy_id):
-    query = """
-        INSERT INTO wp_term_relationships (object_id, term_taxonomy_id)
-        VALUES (%s, %s)
-    """
-    cursor.execute(query, (post_id, term_taxonomy_id))
 
 def insert_scraping_history(scraping_date, scraping_status, site_url):
     conn = None

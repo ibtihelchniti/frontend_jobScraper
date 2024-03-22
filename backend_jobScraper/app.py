@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, send_file
+from flask import Flask, jsonify, send_file, request
 from flask_cors import CORS
 from scrapers.free_work_en import FreeWorkEn
 from scrapers.free_work_fr import FreeWorkFr
@@ -105,6 +105,23 @@ def get_scraping_history():
             if cursor:
                 cursor.close()
             conn.close()
+
+
+@app.route('/download-csv', methods=['GET'])
+def download_csv():
+    try:
+        # Chemin du fichier CSV à télécharger
+        csv_file_path = '../csv/scraping.csv'
+
+        # Vérifier si le fichier CSV existe
+        if os.path.exists(csv_file_path):
+            # Retourner le fichier CSV en tant que réponse
+            return send_file(csv_file_path, as_attachment=True)
+        else:
+            return jsonify({"error": "Fichier CSV introuvable."}), 404
+    except Exception as e:
+        print(f"Erreur lors du téléchargement du CSV : {str(e)}")
+        return jsonify({"error": "Erreur lors du téléchargement du CSV."}), 500
 
     
 if __name__ == '__main__':

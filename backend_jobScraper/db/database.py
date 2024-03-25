@@ -111,3 +111,4 @@ def insert_scraping_history(scraping_date, scraping_status, site_url):
             if cursor:
                 cursor.close()
             conn.close()
+

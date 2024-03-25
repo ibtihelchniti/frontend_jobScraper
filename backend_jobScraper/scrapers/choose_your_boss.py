@@ -110,4 +110,6 @@ class ChooseYourBoss(BaseScraper):
             return parent_element.find_element(By.CSS_SELECTOR, css_selector).text.strip()
         except:
             return default
+
+
     

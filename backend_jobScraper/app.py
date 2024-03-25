@@ -8,6 +8,7 @@ from db.database import insert_scraping_history
 import mysql.connector
 from datetime import datetime
 import os
+import csv
 
 app = Flask(__name__)
 CORS(app)
@@ -107,22 +108,46 @@ def get_scraping_history():
             conn.close()
 
 
-@app.route('/download-csv', methods=['GET'])
-def download_csv():
-    try:
-        # Chemin du fichier CSV à télécharger
-        csv_file_path = '../csv/scraping.csv'
+@app.route('/export-csv', methods=['GET'])
+def export_csv():
+    # Récupérer le nom du site à partir de la requête
+    site_name = request.args.get('site')
 
-        # Vérifier si le fichier CSV existe
-        if os.path.exists(csv_file_path):
-            # Retourner le fichier CSV en tant que réponse
-            return send_file(csv_file_path, as_attachment=True)
-        else:
-            return jsonify({"error": "Fichier CSV introuvable."}), 404
-    except Exception as e:
-        print(f"Erreur lors du téléchargement du CSV : {str(e)}")
-        return jsonify({"error": "Erreur lors du téléchargement du CSV."}), 500
+    # Sélectionnez le scraper en fonction du nom du site
+    if site_name == 'Free Work En':
+        scraper = FreeWorkEn(init_webdriver())  
+        csv_file = "../csv/free_work_en.csv"
+    elif site_name == 'Free Work Fr':
+        scraper = FreeWorkFr(init_webdriver()) 
+        csv_file = "../csv/free_work_fr.csv"
+    elif site_name == 'Choose Your Boss':
+        scraper = ChooseYourBoss(init_webdriver())
+        csv_file = "../csv/choose_your_boss.csv"
+    else:
+        return jsonify({"error": "Site non pris en charge"}), 400
 
-    
+    # Scraper les données pour le site spécifié
+    data = scraper.scrape_jobs()
+
+    if data:
+        try:
+            # Écrire les données dans un fichier CSV
+            with open(csv_file, 'w', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                writer.writerow(["Titre", "Entreprise", "Localisation", "Type", "Salaire", "Expérience", "Description"])
+                for job in data:
+                    writer.writerow([
+                        job['title'], job['company'], job['location'],
+                        job['job_type'], job['salary'], job['experience'], job['description']
+                    ])
+
+            # Renvoyer le fichier CSV en tant que pièce jointe
+            return send_file(csv_file, as_attachment=True)
+        except Exception as e:
+            return jsonify({"error": f"Erreur lors de l'exportation en CSV : {str(e)}"}), 500
+    else:
+        return jsonify({"error": "Aucune donnée à exporter"}), 404
+
+
 if __name__ == '__main__':
     app.run(debug=True)

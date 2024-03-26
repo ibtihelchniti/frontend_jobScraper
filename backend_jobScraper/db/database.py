@@ -1,6 +1,6 @@
 import mysql.connector
 
-def insert_job_offer_into_db(title, company, location, job_type, logo_url, salary, experience, description, unique_id):
+def insert_job_offer_into_db(unique_id, title, company, logo_url, location, job_type, salary, experience, description):
     conn = None
     try:
         conn = mysql.connector.connect(

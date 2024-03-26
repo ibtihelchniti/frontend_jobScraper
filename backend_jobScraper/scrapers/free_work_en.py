@@ -10,6 +10,7 @@ class FreeWorkEn(BaseScraper):
     def __init__(self, driver):
         super().__init__('https://www.free-work.com/en-gb/tech-it/jobs') 
         self.driver = driver 
+        self.scraped_data = []
 
     def scrape_jobs(self):
         try:
@@ -24,6 +25,8 @@ class FreeWorkEn(BaseScraper):
             print(f"Erreur lors du scraping : {e}")
         finally:
             self.driver.quit()
+        
+        return self.scraped_data
 
     def _wait_for_job_elements(self):
         WebDriverWait(self.driver, 10).until(
@@ -86,7 +89,19 @@ class FreeWorkEn(BaseScraper):
                 print(f'Titre: {title}\nEntreprise: {company}\nLocalisation: {location}\nType: {job_type}\nLogo: {logo_url}\nSalaire: {salary}\nExpérience nécessaire: {experience}\nDescription: {description}\n{"-"*20}')
 
                 # Insérer les détails de l'offre dans la base de données
-                insert_job_offer_into_db(title, company, location, job_type, logo_url, salary, experience, description, unique_id)
+                insert_job_offer_into_db(unique_id, title, company, logo_url, location, job_type, salary, experience, description)
+
+                self.scraped_data.append({
+                        "unique_id": unique_id,
+                        "title": title,
+                        "company": company,
+                        "logo_url": logo_url,
+                        "location": location,
+                        "job_type": job_type,
+                        "salary": salary,
+                        "experience": experience,
+                        "description": description,
+                    })
 
             except Exception as e:
                 print(f"Erreur lors du scraping de cette offre : {e}")

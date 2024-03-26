@@ -9,6 +9,9 @@ import mysql.connector
 from datetime import datetime
 import os
 import csv
+import pandas as pd
+import sys
+
 
 app = Flask(__name__)
 CORS(app)
@@ -115,14 +118,14 @@ def export_csv():
 
     # Sélectionnez le scraper en fonction du nom du site
     if site_name == 'Free Work En':
-        scraper = FreeWorkEn(init_webdriver())  
-        csv_file = "../csv/free_work_en.csv"
+        scraper = FreeWorkEn(init_webdriver())
+        csv_file = os.path.join(os.path.dirname(__file__), '..', 'csv', 'free_work_en.csv')
     elif site_name == 'Free Work Fr':
-        scraper = FreeWorkFr(init_webdriver()) 
-        csv_file = "../csv/free_work_fr.csv"
+        scraper = FreeWorkFr(init_webdriver())
+        csv_file = os.path.join(os.path.dirname(__file__), '..', 'csv', 'free_work_fr.csv')
     elif site_name == 'Choose Your Boss':
         scraper = ChooseYourBoss(init_webdriver())
-        csv_file = "../csv/choose_your_boss.csv"
+        csv_file = os.path.join(os.path.dirname(__file__), '..', 'csv', 'choose_your_boss.csv')
     else:
         return jsonify({"error": "Site non pris en charge"}), 400
 
@@ -131,18 +134,22 @@ def export_csv():
 
     if data:
         try:
+            # Convertir les données en DataFrame Pandas pour inspection
+            df = pd.DataFrame(data)
+
+             # Réorganiser les colonnes selon votre structure souhaitée
+            df = df[['unique_id', 'title', 'company','logo_url', 'location', 'job_type', 'salary', 'experience', 'description' ]]
+
+            # Afficher le DataFrame dans la console Flask pour inspection
+            print("DataFrame Pandas des offres avant l'exportation en CSV :")
+            print(df)  
+
             # Écrire les données dans un fichier CSV
-            with open(csv_file, 'w', newline='', encoding='utf-8') as file:
-                writer = csv.writer(file)
-                writer.writerow(["Titre", "Entreprise", "Localisation", "Type", "Salaire", "Expérience", "Description"])
-                for job in data:
-                    writer.writerow([
-                        job['title'], job['company'], job['location'],
-                        job['job_type'], job['salary'], job['experience'], job['description']
-                    ])
+            csv_file_path = os.path.abspath(csv_file)
+            df.to_csv(csv_file_path, index=False)
 
             # Renvoyer le fichier CSV en tant que pièce jointe
-            return send_file(csv_file, as_attachment=True)
+            return send_file(csv_file_path, as_attachment=True)
         except Exception as e:
             return jsonify({"error": f"Erreur lors de l'exportation en CSV : {str(e)}"}), 500
     else:

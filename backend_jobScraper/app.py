@@ -111,6 +111,7 @@ def get_scraping_history():
             conn.close()
 
 
+
 @app.route('/export-csv', methods=['GET'])
 def export_csv():
     # Récupérer le nom du site à partir de la requête
@@ -119,13 +120,13 @@ def export_csv():
     # Sélectionnez le scraper en fonction du nom du site
     if site_name == 'Free Work En':
         scraper = FreeWorkEn(init_webdriver())
-        csv_file = os.path.join(os.path.dirname(__file__), '..', 'csv', 'free_work_en.csv')
+        csv_file = f'free_work_en_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'  # Ajouter un horodatage au nom du fichier
     elif site_name == 'Free Work Fr':
         scraper = FreeWorkFr(init_webdriver())
-        csv_file = os.path.join(os.path.dirname(__file__), '..', 'csv', 'free_work_fr.csv')
+        csv_file = f'free_work_fr_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'  # Ajouter un horodatage au nom du fichier
     elif site_name == 'Choose Your Boss':
         scraper = ChooseYourBoss(init_webdriver())
-        csv_file = os.path.join(os.path.dirname(__file__), '..', 'csv', 'choose_your_boss.csv')
+        csv_file = f'choose_your_boss_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'  # Ajouter un horodatage au nom du fichier
     else:
         return jsonify({"error": "Site non pris en charge"}), 400
 
@@ -134,27 +135,26 @@ def export_csv():
 
     if data:
         try:
-            # Convertir les données en DataFrame Pandas pour inspection
+            # Convertir les données en DataFrame Pandas
             df = pd.DataFrame(data)
 
-             # Réorganiser les colonnes selon votre structure souhaitée
-            df = df[['unique_id', 'title', 'company','logo_url', 'location', 'job_type', 'salary', 'experience', 'description' ]]
+            # Réorganiser les colonnes selon la structure souhaitée
+            df = df[['unique_id', 'title', 'company', 'location', 'job_type', 'logo_url', 'salary', 'experience', 'description']]
 
-            # Afficher le DataFrame dans la console Flask pour inspection
-            print("DataFrame Pandas des offres avant l'exportation en CSV :")
-            print(df)  
+            # Écrire les données dans un fichier CSV temporaire
+            temp_csv_file = f'temp_{csv_file}'
+            df.to_csv(temp_csv_file, index=False, encoding='utf-8-sig')  # Utilisez utf-8-sig pour éviter les problèmes d'encodage
 
-            # Écrire les données dans un fichier CSV
-            csv_file_path = os.path.abspath(csv_file)
-            df.to_csv(csv_file_path, index=False)
+            # Définir le chemin complet du fichier de téléchargement
+            download_path = os.path.join(app.root_path, temp_csv_file)
 
-            # Renvoyer le fichier CSV en tant que pièce jointe
-            return send_file(csv_file_path, as_attachment=True)
+            # Renvoyer le fichier CSV en tant que pièce jointe avec un nom spécifié pour le téléchargement
+            return send_file(download_path, as_attachment=True, attachment_filename=csv_file)
         except Exception as e:
             return jsonify({"error": f"Erreur lors de l'exportation en CSV : {str(e)}"}), 500
     else:
         return jsonify({"error": "Aucune donnée à exporter"}), 404
-
+    
 
 if __name__ == '__main__':
     app.run(debug=True)

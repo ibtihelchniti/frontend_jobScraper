@@ -25,9 +25,9 @@ def insert_job_offer_into_db(unique_id, title, company, logo_url, location, job_
                 INSERT INTO wp_posts (post_author, post_date, post_date_gmt, post_content, post_title, post_excerpt, 
                 post_status, comment_status, ping_status, post_name, post_modified, post_modified_gmt, post_parent, 
                 guid, menu_order, post_type, comment_count, to_ping, pinged, post_content_filtered) 
-                VALUES (%s, NOW(), NOW(), %s, %s, '', 'publish', 'closed', 'closed', %s, NOW(), NOW(), 0, '', 0, 'job_listing', 0, '', '', '')
+                VALUES (%s, NOW(), NOW(), %s, %s, '', 'publish', 'closed', 'closed', %s, NOW(), NOW(), 0, '', 0, %s, 0, '', '', '')
             """)
-            data = (1, description, title, unique_id)
+            data = (1, description, title, unique_id, job_type)
             cursor.execute(query, data)
             post_id = cursor.lastrowid
 

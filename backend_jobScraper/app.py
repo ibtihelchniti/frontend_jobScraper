@@ -13,9 +13,9 @@ import time
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app) 
 
-    
+# Route pour le scraping du site Free Work En  
 @app.route('/scrape-en', methods=['GET'])
 def scrape_jobs():
     try:
@@ -33,7 +33,7 @@ def scrape_jobs():
         return jsonify({"success": False, "message": str(e)})
 
 
-
+# Route pour le scraping du site Free Work Fr
 @app.route('/scrape-fr', methods=['GET'])
 def scrape_jobs_fr():
     try:
@@ -50,6 +50,8 @@ def scrape_jobs_fr():
         insert_scraping_history(datetime.now(), "Failed", "https://www.free-work.com/fr/tech-it/jobs") 
         return jsonify({"success": False, "message": str(e)})
 
+
+# Route pour le scraping du site Choose Your Boss
 @app.route('/scrape-ch', methods=['GET'])
 def scrape_jobs_ch():
     try:
@@ -67,6 +69,7 @@ def scrape_jobs_ch():
         return jsonify({"success": False, "message": str(e)})
     
 
+# Route pour récupérer l'historique de scraping
 @app.route('/scraping-history', methods=['GET'])
 def get_scraping_history():
     try:
@@ -110,6 +113,7 @@ def get_scraping_history():
             conn.close()
 
 
+# Route pour exporter les données en CSV
 @app.route('/export-csv', methods=['GET'])
 def export_csv():
     # Récupérer le nom du site à partir de la requête

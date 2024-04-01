@@ -55,12 +55,14 @@ def insert_job_offer_into_db(unique_id, title, company, location, job_type, sala
             conn.close()
 
 
+# Fonction pour récupérer l'ID de l'offre d'emploi par son ID unique
 def get_post_id_by_unique_id(cursor, unique_id):
     cursor.execute("SELECT ID FROM wp_posts WHERE post_name = %s", (unique_id,))
     row = cursor.fetchone()
     return row[0] if row else None
 
 
+# Fonction pour récupérer l'ID de la taxonomie des types d'emploi
 def get_term_taxonomy_id(cursor, job_type):
     cursor.execute("SELECT term_taxonomy_id FROM wp_term_taxonomy WHERE term_id IN (SELECT term_id FROM wp_terms WHERE name = %s)", (job_type,))
     rows = cursor.fetchall()  
@@ -70,7 +72,7 @@ def get_term_taxonomy_id(cursor, job_type):
     return term_taxonomy_id
 
 
-
+# Fonction pour ajouter l'offre d'emploi aux relations de termes
 def add_job_to_term_relationships(cursor, post_id, term_id):
     query = """
         INSERT INTO wp_term_relationships (object_id, term_taxonomy_id)
@@ -79,7 +81,7 @@ def add_job_to_term_relationships(cursor, post_id, term_id):
     cursor.execute(query, (post_id, term_id))
 
 
-    
+# Fonction pour mettre à jour les métadonnées de l'offre d'emploi   
 def update_postmeta(cursor, post_id, meta_key, meta_value):
     query = ("""
         INSERT INTO wp_postmeta (post_id, meta_key, meta_value) 
@@ -90,6 +92,7 @@ def update_postmeta(cursor, post_id, meta_key, meta_value):
     cursor.execute(query, (post_id, meta_key, meta_value))
     
 
+# Fonction pour insérer l'historique de scraping dans la base de données
 def insert_scraping_history(scraping_date, scraping_status, site_url):
     conn = None
     try:

@@ -146,14 +146,20 @@ def export_csv():
             csv_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'csv', csv_file_name))
 
             # Écrire les données dans un nouveau fichier CSV
-            df.to_csv(csv_file_path, index=False, encoding='utf-8-sig')  
+            df.to_csv(csv_file_path, index=False, encoding='utf-8-sig')
+
+            # Insérer les données dans la base de données pour succès lors de l'exportation en CSV
+            insert_scraping_history(datetime.now(), "Success", f"Export CSV - {site_name}")
 
             # Retourner le chemin du fichier CSV pour téléchargement
             return send_from_directory(os.path.dirname(csv_file_path), csv_file_name, as_attachment=True)
         except Exception as e:
+            # En cas d'erreur, insérer l'échec dans la base de données
+            insert_scraping_history(datetime.now(), "Failed", f"Export CSV - {site_name}")
             return jsonify({"error": f"Erreur lors de l'exportation en CSV : {str(e)}"}), 500
     else:
         return jsonify({"error": "Aucune donnée à exporter"}), 404
+
 
 
 

@@ -110,6 +110,7 @@ def insert_scraping_history(scraping_date, scraping_status, site_url):
         cursor.execute(query, data)
         
         conn.commit()
+        print("Données insérées avec succès dans la table scraping_history.")
     except mysql.connector.Error as err:
         print(f"Erreur MySQL: {err}")
         conn.rollback()
@@ -118,4 +119,5 @@ def insert_scraping_history(scraping_date, scraping_status, site_url):
             if cursor:
                 cursor.close()
             conn.close()
+
 

@@ -98,10 +98,10 @@ def insert_scraping_history(scraping_date, scraping_status, site_url):
     try:
         conn = mysql.connector.connect(
             user='root',
-            password='root',
+            password='Ibtihel456@Chniti',
             host='localhost',
-            database='local',
-            port=10005
+            database='scraping_management',
+            port=3306
         )
         cursor = conn.cursor()
         

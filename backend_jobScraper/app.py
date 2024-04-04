@@ -75,10 +75,10 @@ def get_scraping_history():
     try:
         conn = mysql.connector.connect(
             user='root',
-            password='root',
+            password='Ibtihel456@Chniti',
             host='localhost',
-            database='local',
-            port=10005
+            database='scraping_management',
+            port=3306
         )
         cursor = conn.cursor(dictionary=True)
 
@@ -116,8 +116,8 @@ def get_scraping_history():
 # Route pour exporter les données en CSV
 @app.route('/export-csv', methods=['GET'])
 def export_csv():
-    # Récupérer le nom du site à partir de la requête
-    site_name = request.args.get('site')
+    
+    site_name = request.args.get('site') # Récupérer le nom du site à partir de la requête
 
     # Sélectionnez le scraper en fonction du nom du site
     if site_name == 'Free Work En':
@@ -129,16 +129,16 @@ def export_csv():
     else:
         return jsonify({"error": "Site non pris en charge"}), 400
 
-    # Scraper les données pour le site spécifié
-    data = scraper.scrape_jobs()
+    try:
+        # Scraper les données pour le site spécifié
+        data = scraper.scrape_jobs()
 
-    if data:
-        try:
+        if data:
             # Convertir les données en DataFrame Pandas
             df = pd.DataFrame(data)
 
             # Réorganiser les colonnes selon la structure souhaitée
-            df = df[['unique_id', 'title', 'company', 'location', 'job_type', 'salary', 'experience', 'description','logo_url' ]]
+            df = df[['unique_id', 'title', 'company', 'location', 'job_type', 'salary', 'experience', 'description', 'logo_url']]
 
             # Générer un nom de fichier unique basé sur le timestamp actuel
             timestamp = int(time.time())
@@ -149,17 +149,16 @@ def export_csv():
             df.to_csv(csv_file_path, index=False, encoding='utf-8-sig')
 
             # Insérer les données dans la base de données pour succès lors de l'exportation en CSV
-            insert_scraping_history(datetime.now(), "Success", f"Export CSV - {site_name}")
+            insert_scraping_history(datetime.now(), "Success", scraper.site_url)
 
             # Retourner le chemin du fichier CSV pour téléchargement
             return send_from_directory(os.path.dirname(csv_file_path), csv_file_name, as_attachment=True)
-        except Exception as e:
-            # En cas d'erreur, insérer l'échec dans la base de données
-            insert_scraping_history(datetime.now(), "Failed", f"Export CSV - {site_name}")
-            return jsonify({"error": f"Erreur lors de l'exportation en CSV : {str(e)}"}), 500
-    else:
-        return jsonify({"error": "Aucune donnée à exporter"}), 404
-
+        else:
+            return jsonify({"error": "Aucune donnée à exporter"}), 404
+    except Exception as e:
+        # En cas d'erreur, insérer l'échec dans la base de données
+        insert_scraping_history(datetime.now(), "Failed", f"Export CSV - {site_name}")
+        return jsonify({"error": f"Erreur lors de l'exportation en CSV : {str(e)}"}), 500
 
 
 

@@ -5,18 +5,50 @@ import time
 import hashlib
 from .base_scraper import BaseScraper
 from db.database import insert_job_offer_into_db
+import mysql.connector
 
+# Connexion à la base de données
+conn = None
+try:
+    conn = mysql.connector.connect(
+        user='root',
+        password='Ibtihel456@Chniti',
+        host='localhost',
+        database='scraping_management',
+        port=3306
+    )
+    cursor = conn.cursor()
+
+except Exception as e:
+    print(f"Erreur lors de la connexion à la base de données : {e}")
+    exit()
+        
 
 #Définition de la classe qui hérite de base scraper
 class FreeWorkEn(BaseScraper):
     def __init__(self, driver):
-        super().__init__('https://www.free-work.com/en-gb/tech-it/jobs') # URL du site à scraper
+        super().__init__() 
         self.driver = driver 
         self.scraped_data = [] # Liste pour stocker les données scrapées
 
     
+    def get_site_url(self, site_id):
+        try:
+            sql = "SELECT site_url FROM scrap_config WHERE site_id =%s"
+            cursor.execute(sql, (site_id,))
+            result = cursor.fetchone()
+            return result[0] if result else None
+        except Exception as e:
+            print(f"Erreur lors de la récupération de l'URL du site : {e}")
+            return None
+
+    
     # Méthode pour scraper les offres d'emploi
-    def scrape_jobs(self):
+    def scrape_jobs(self, site_id):
+        self.url = self.get_site_url(site_id=1) # Récupérer l'URL du site à partir de la base de données
+        if not self.url:
+            print("Site URL non trouvé dans la base de données.")
+            return []
         try:
             self.driver.get(self.url) # Chargement de l'URL
             while True:

@@ -1,0 +1,68 @@
+<!-- Titre de la page -->
+<br><br>
+<h2>Liste des Sites</h2>
+<br><br><br>
+
+<!-- Tableau pour afficher les sites -->
+<div class="table-responsive">
+    <table id="datatable" class="table data-table table-striped table-bordered">
+        <!-- En-tête du tableau -->
+        <thead>
+            <tr>
+                <th>Nom du site</th>
+                <th>Url</th>
+                <th>Date du dernier Scraping</th>
+                <th>Etat du dernier Scraping</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Boucle sur chaque site dans la liste "sites" -->
+            <tr *ngFor="let site of sites">
+                <!-- Colonne pour le nom du site -->
+                <td>{{ site.name }}</td>
+
+                <!-- Colonne pour l'URL du site avec lien cliquable -->
+                <td><a href="{{ site.url }}" target="_blank">{{ site.url }}</a></td>
+
+                <!-- Colonne pour la date du dernier scraping -->
+                <td>{{ site.lastScrapingDate }}</td>
+
+                <!-- Colonne pour l'état du dernier scraping -->
+                <td>
+                    <!-- Afficher l'état du scraping réussi ou échoué -->
+                    <span *ngIf="site.scrapingStatus === 'Réussi'; else failedStatus">{{ site.scrapingStatus }}</span>
+                    <ng-template #failedStatus>
+                        <span>{{ site.scrapingStatus }}</span>
+                    </ng-template>
+                </td>
+
+                <!-- Colonne pour les actions -->
+                <td>
+                    <div class="site-controls">
+                        <!-- Bouton pour démarrer ou arrêter le scraping -->
+                        <button [disabled]="site.isScraping || site.isExportingCSV" (click)="toggleScraping(site)">
+                            <ng-container *ngIf="site.isScraping; else startScraping">
+                                <i class="fas fa-spinner fa-spin"></i> Scraping en cours...
+                            </ng-container>
+                            <ng-template #startScraping>Démarrer le Scraping</ng-template>
+                        </button>
+
+                        <!-- Bouton pour exporter les données CSV -->
+                        <button [disabled]="site.isScraping || site.isExportingCSV" (click)="exportCSV(site)">
+                            <ng-container *ngIf="site.isExportingCSV; else startExportCSV">
+                                <i class="fa-solid fa-file-csv fa-beat-fade"></i>
+                            </ng-container>
+                            <ng-template #startExportCSV><i class="fas fa-file-csv"></i></ng-template>
+                        </button>
+
+                        <!-- lien pour la configuration  -->
+                        <button (click)="openConfig(site)">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

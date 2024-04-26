@@ -37,14 +37,6 @@ export class ScrapingService {
   exportToCSV(siteId: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/export-csv?site_id=${encodeURIComponent(siteId)}`, { responseType: 'blob' });
   }
-  
-
-
-
-  getSiteDetails(siteName: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/site-details/${siteName}`);
-  }
-
 
   updateSiteDetails(siteId: number, newName: string, newUrl: string): Observable<any> {
     return this.http.put(`${this.apiUrl}/site-details/${siteId}`, { name: newName, url: newUrl });

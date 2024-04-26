@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ScrapingService } from '../scraping.service';
+import { Observable } from 'rxjs';
+import { DatePipe } from '@angular/common';
 
 
 // Interface pour définir la structure des sites
 interface Site {
+  id: number;
   name: string;
   url: string;
   isScraping: boolean; // Indique si le scraping est en cours
@@ -26,8 +29,9 @@ export class SiteListComponent implements OnInit {
   sites: Site[] = [
     // Liste des sites à scraper
     { 
-      name: 'Free Work En', 
-      url: 'https://www.free-work.com/en-gb/tech-it/jobs', 
+      id: 1,
+      name: '', 
+      url: '', 
       isScraping: false, 
       isExportingCSV: false,
       scrapingCompleted: false,
@@ -36,8 +40,9 @@ export class SiteListComponent implements OnInit {
     },
     
     { 
-      name: 'Free Work Fr', 
-      url: 'https://www.free-work.com/fr/tech-it/jobs', 
+      id: 2,
+      name: '', 
+      url: '', 
       isScraping: false, 
       isExportingCSV: false,
       scrapingCompleted: false,
@@ -46,8 +51,9 @@ export class SiteListComponent implements OnInit {
     },
 
     { 
-      name: 'Choose Your Boss', 
-      url: 'https://www.chooseyourboss.com/offres/emploi-it', 
+      id: 3,
+      name: '', 
+      url: '', 
       isScraping: false, 
       isExportingCSV: false,
       scrapingCompleted: false,
@@ -56,201 +62,159 @@ export class SiteListComponent implements OnInit {
     },
   ];
 
-  constructor(private router: Router, private scrapingService: ScrapingService) { }
+  constructor(private router: Router, private scrapingService: ScrapingService, private datePipe: DatePipe) { } // Injecter le service de routage et le service de scraping dans le composant
 
   ngOnInit(): void {
-    this.getScrapingHistory(); 
+    this.sites.forEach(site => {
+        this.getSiteDetailsById(site.id); // Appeler la fonction pour récupérer les détails des sites au chargement du composant
+    });
+    this.getScrapingHistory(); // Appeler la fonction pour récupérer l'historique de scraping au chargement du composant
   }
 
   
-  // Fonction pour récupérer l'historique de scraping depuis le backend
-  getScrapingHistory(): void {
-    this.scrapingService.getScrapingHistory().subscribe(
-        (history: Object) => {  
-            const historyArray = Object.values(history); // Convertir l'objet d'historique en tableau
-            historyArray.forEach((historyItem: any) => { // Parcourir chaque élément d'historique
-                const index = this.sites.findIndex(site => site.url === historyItem.site_url); // Trouver l'index du site correspondant dans le tableau
-                if (index !== -1) {
-                  // Mettre à jour les informations de scraping du site
-                    this.sites[index].lastScrapingDate = historyItem.lastScrapingDate;
-                    this.sites[index].scrapingStatus = historyItem.scrapingStatus;
-                }
-            });
+  // Fonction pour récupérer les détails d'un site par son ID depuis le backend
+  getSiteDetailsById(siteId: number): void {
+    this.scrapingService.getSiteDetailsById(siteId).subscribe(
+        (data: any) => {
+            const site = this.sites.find(s => s.id === siteId);
+            if (site) {
+                site.name = data.site_name;
+                site.url = data.site_url;
+                site.lastScrapingDate = data.lastScrapingDate; 
+                site.scrapingStatus = data.scrapingStatus;
+            }
         },
         (error) => {
-            console.error('Erreur lors de la récupération de l\'historique de scraping', error);
-            alert ('Erreur lors de la récupération de l\'historique de scraping. Détails : ' + error.message);
+            console.error('Erreur lors de la récupération des détails des sites', error);
+            alert('Erreur lors de la récupération des détails des sites. Détails : ' + error.message);
         }
     );
-  }
+  } 
+
 
   
   // Fonction pour lancer le scraping d'un site
   toggleScraping(site: Site): void {
-    // Appeler la fonction de scraping appropriée en fonction du nom du site
-    if (site.name === 'Free Work En') {
-      this.toggleScrapingEn(site);
-    } else if (site.name === 'Free Work Fr') {
-      this.toggleScrapingFr(site);
-    } else if (site.name === 'Choose Your Boss') {
-      this.toggleScrapingCh(site);
+    this.scrapeJobs(site.id); // Appeler la fonction pour scraper les offres d'emploi d'un site
+  }
+
+  // Fonction pour scraper les offres d'emploi d'un site
+  scrapeJobs(siteId: number): void {
+    const site = this.sites.find(site => site.id === siteId);
+    if (!site) return; // Site non trouvé
+
+    site.isScraping = true; // Définir l'indicateur de scraping à true
+
+    let scrapeObservable: Observable<any>;
+
+    switch (siteId) {
+      // Cas pour Free Work En
+      case 1:
+        scrapeObservable = this.scrapingService.scrapeJobsEn(site.url);
+        break;
+      // Cas pour Free Work Fr
+      case 2:
+        scrapeObservable = this.scrapingService.scrapeJobsFr(site.url);
+        break; 
+      // Cas pour Choose Your Boss
+      case 3:
+        scrapeObservable = this.scrapingService.scrapeJobsCh(site.url);
+        break;
+      default:
+        console.error('Invalid site ID for scraping');
+        return;
     }
-  }
 
+    scrapeObservable.subscribe(
+      (response) => {
+        console.log('Scraping successful', response);
+        alert('Scraping for ' + site.name + ' was successful.');
   
-  // Fonction pour lancer le scraping du site Free Work En
-  toggleScrapingEn(site: Site): void {
-    site.isScraping = true; // Mettre l'indicateur de scraping à vrai
-    this.scrapingService.scrapeJobsEn(site.url).subscribe( // Appeler le service de scraping pour le site Free Work En
-      (response) => { // En cas de succès du scraping
-        console.log('Scraping réussi', response);
-        alert('Le scraping pour le site' + site.name + 'a été réussi.');
-
-        // Mettre à jour les informations du site
-        site.isScraping = false;
-        site.scrapingCompleted = true;
-        site.lastScrapingDate = new Date().toLocaleString();
-        site.scrapingStatus = 'Réussi';
-
-        // Réinitialiser l'état des boutons après un court délai
-        setTimeout(() => {
-          site.isScraping = false;
-          site.scrapingCompleted = false;
-          site.scrapingStatus = '';
-        }, 2000); // 2000 millisecondes = 2 secondes
-
+        // Mettre à jour les informations du site après un scraping réussi
+        this.updateSiteScrapingInfo(site, true);
       },
-
-      (error) => { // En cas d'échec du scraping
-        console.error('Erreur lors du scraping', error);
-        alert('Erreur lors du scraping pour le site' + site.name + '. Détails : ' + error.message);
-
-        // Mettre à jour les informations du site
-        site.isScraping = false;
-        site.lastScrapingDate = new Date().toLocaleString();
-        site.scrapingStatus = 'Echoué';
-
-        setTimeout(() => {
-          site.isScraping= false;
-          site.scrapingCompleted = false;
-          site.scrapingStatus = '';
-        }, 2000); 
+      (error) => {
+        console.error('Scraping error', error);
+        alert('Error scraping for ' + site.name + '. Details: ' + error.message);
+  
+        // Mettre à jour les informations du site après un échec de scraping
+        this.updateSiteScrapingInfo(site, false);
       }
     );
   }
-
   
-  // Fonction pour lancer ou arrêter le scraping du site Free Work Fr
-  toggleScrapingFr(site: Site): void {
-    site.isScraping = true; // Mettre l'indicateur de scraping à vrai
-    this.scrapingService.scrapeJobsFr(site.url).subscribe( // Appeler le service de scraping pour le site Free Work Fr
-      (response) => { // En cas de succès du scraping
-        console.log('Scraping réussi', response);
-        alert('Le scraping pour le site' + site.name + 'a été réussi.');
+  updateSiteScrapingInfo(site: Site, success: boolean): void {
+    site.isScraping = false;
+    site.scrapingCompleted = true;
+    site.lastScrapingDate = new Date().toLocaleString(); // Mettre à jour avec la date réelle
+    site.scrapingStatus = success ? 'Success' : 'Failed';
+  
+    // Réinitialiser les états des boutons après un court délai
+    setTimeout(() => {
+      site.isScraping = false;
+      site.scrapingCompleted = false;
+      site.scrapingStatus = '';
+    }, 2000);
+  }
+  
+  
 
-        // Mettre à jour les informations du site
-        site.isScraping = false;
-        site.scrapingCompleted = true;
-        site.lastScrapingDate = new Date().toLocaleString();
-        site.scrapingStatus = 'Réussi';
-
-        // Réinitialiser l'état des boutons après un court délai
-        setTimeout(() => {
-          site.isScraping= false;
-          site.scrapingCompleted = false;
-          site.scrapingStatus = '';
-        }, 2000); // 2000 millisecondes = 2 secondes
+  // Dans la méthode getScrapingHistory, mettez à jour le traitement des dates
+  getScrapingHistory(): void {
+    this.scrapingService.getScrapingHistory().subscribe(
+      (history: any[]) => {
+        this.sites.forEach(site => {
+          const historyForSite = history.find(item => item.site_url === site.url);
+          if (historyForSite) {
+            site.lastScrapingDate = historyForSite.lastScrapingDate;
+            site.scrapingStatus = historyForSite.scrapingStatus;
+          }
+        });
       },
-      (error) => { // En cas d'échec du scraping
-        console.error('Erreur lors du scraping', error);
-        alert('Erreur lors du scraping pour le site' + site.name + '. Détails : ' + error.message);
-
-        site.isScraping = false;
-        site.lastScrapingDate = new Date().toLocaleString();
-        site.scrapingStatus = 'Echoué';
-
-        setTimeout(() => {
-          site.isScraping= false;
-          site.scrapingCompleted = false;
-          site.scrapingStatus = '';
-        }, 2000); 
+      (error) => {
+        console.error('Erreur lors de la récupération de l\'historique de scraping', error);
+        alert('Erreur lors de la récupération de l\'historique de scraping. Détails : ' + error.message);
       }
     );
   }
-
   
-  // Fonction pour lancer ou arrêter le scraping du site Choose Your Boss
-  toggleScrapingCh(site: Site): void {
-    site.isScraping = true; // Mettre l'indicateur de scraping à vrai
-    this.scrapingService.scrapeJobsCh(site.url).subscribe( // Appeler le service de scraping pour le site Choose Your Boss
-      (response) => { // En cas de succès du scraping
-        console.log('Scraping réussi', response);
-        alert('Le scraping pour le site' + site.name + 'a été réussi.');
-
-        // Mettre à jour les informations du site
-        site.isScraping = false;
-        site.scrapingCompleted = true;
-        site.lastScrapingDate = new Date().toLocaleString();
-        site.scrapingStatus = 'Réussi';
-
-        // Réinitialiser l'état des boutons après un court délai
-        setTimeout(() => {
-          site.isScraping= false;
-          site.scrapingCompleted = false;
-          site.scrapingStatus = '';
-        }, 2000); // 2000 millisecondes = 2 secondes
-      },
-      (error) => { // En cas d'échec du scraping
-        console.error('Erreur lors du scraping', error);
-        alert('Erreur lors du scraping pour le site' + site.name + '. Détails : ' + error.message);
-
-        site.isScraping = false;
-        site.lastScrapingDate = new Date().toLocaleString();
-        site.scrapingStatus = 'Echoué';
-
-        setTimeout(() => {
-          site.isScraping= false;
-          site.scrapingCompleted = false;
-          site.scrapingStatus = '';
-        }, 2000); 
-      }
-    );
-  }
 
 
   // Fonction pour exporter les données en CSV
   exportCSV(site: Site): void {
     // Mettre les indicateurs de scraping et d'exportation à vrai
-    site.isExportingCSV = true;  
+    site.isExportingCSV = true;
     site.isScraping = true;
-
-    this.scrapingService.exportToCSV(site.name).subscribe(
-        (response: Blob) => {
-            console.log('Réponse de l\'exportation CSV', response);
-            // Créer un objet URL pour le Blob et ouvrir le lien dans une nouvelle fenêtre
-            const blobUrl = URL.createObjectURL(response);
-            window.open(blobUrl, '_blank');
-        },
-        (error) => {
-            console.error('Erreur lors de l\'exportation CSV', error);
-            alert('Une erreur est survenue lors de l\'exportation en CSV pour le site ' + site.name + '. Détails : ' + error.message);
-        },
-        () => {
-          site.isExportingCSV = false;  
-          site.isScraping = false;  
-        }
+  
+    this.scrapingService.exportToCSV(site.id.toString()).subscribe(
+      (response: Blob) => {
+        const blob = new Blob([response], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        const csvFileName = `${site.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString()}.csv`;
+        anchor.href = url;
+        anchor.download = csvFileName; // Utiliser le nom spécifique du fichier CSV
+        anchor.click();
+  
+        // Réinitialiser les indicateurs après le téléchargement
+        site.isExportingCSV = false;
+        site.isScraping = false;
+      },
+      (error) => {
+        console.error('Erreur lors de l\'exportation CSV', error);
+        alert('Une erreur est survenue lors de l\'exportation en CSV pour le site ' + site.name + '. Détails : ' + error.message);
+  
+        // Réinitialiser les indicateurs en cas d'erreur
+        site.isExportingCSV = false;
+        site.isScraping = false;
+      }
     );
   }
+  
 
   // méthode pour ouvrir la page de configuration du site
   openConfig(site: Site): void {
-    // Redirigez l'utilisateur vers la page de configuration avec le nom du site
-    this.router.navigate(['/config', site.name.replace(/\s/g, '-')]);
-     
+    this.router.navigate(['/config', site.id]);  
   }
-
-
-
-
 
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ScrapingService } from '../scraping.service';
+import { Router } from '@angular/router'; 
 
 @Component({
   selector: 'app-config',
@@ -9,42 +10,45 @@ import { ScrapingService } from '../scraping.service';
 })
 export class ConfigComponent implements OnInit {
 
+  siteId: number = 0;
   siteName: string = '';
   siteUrl: string = '';
 
-  constructor(private route: ActivatedRoute, private scrapingService: ScrapingService) { }
+  constructor(private route: ActivatedRoute, private scrapingService: ScrapingService, private router: Router) { }
+
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.siteName = params['siteName'];
-      // Fetch the site details using the site name from the backend
-      this.fetchSiteDetails(this.siteName);
-    });
+    this.siteId = +this.route.snapshot.params['siteId']; // Récupération de l'identifiant du site à partir des paramètres d'URL
+    this.fetchSiteDetails(this.siteId); // Appel de la fonction pour récupérer les détails du site
   }
 
-  fetchSiteDetails(siteName: string): void {
-    this.scrapingService.getSiteDetails(siteName).subscribe(
+  // Fonction pour récupérer les détails du site à partir de son identifiant
+  fetchSiteDetails(siteId: number): void {
+    this.scrapingService.getSiteDetailsById(siteId).subscribe(
       (siteDetails: any) => {
-        this.siteUrl = siteDetails.url; // Update site URL from fetched details
+        this.siteId = siteId; // Récupérer l'identifiant du site
+        this.siteName = siteDetails.site_name; // Récupérer le nom du site à partir de la base de données
+        this.siteUrl = siteDetails.site_url; // Récupérer l'URL du site à partir de la base de données
       },
       (error: any) => {
         console.error('Error fetching site details:', error);
-        // Handle error or display a message to the user
       }
     );
   }
 
+  // Fonction pour mettre à jour les détails du site
   updateSiteDetails(): void {
-    this.scrapingService.updateSiteDetails(this.siteName, this.siteUrl).subscribe(
+    // Mettre à jour les détails du site avec le nom et l'URL
+    this.scrapingService.updateSiteDetails(this.siteId, this.siteName, this.siteUrl).subscribe(
       (response: any) => {
-        console.log('Site details updated successfully:', response);
-        // Handle success, e.g., display a success message
+        console.log('Détails du site mis à jour avec succès :', response);
+        // Rediriger vers la liste des sites après la mise à jour réussie
+        this.router.navigate(['/site-list']);
       },
       (error: any) => {
-        console.error('Error updating site details:', error);
-        // Handle error or display a message to the user
+        console.error('Erreur lors de la mise à jour des détails du site :', error);
       }
     );
-  }
+}
 
 }

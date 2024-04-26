@@ -6,9 +6,10 @@ import { ConfigComponent } from './config/config.component';
 
 const routes: Routes = [
   { path: 'sites', component: SiteListComponent },
-  { path: 'config/:siteName', component: ConfigComponent }, // Route pour la page de configuration avec le nom du site en paramètre
+  { path: 'config/:siteId', component: ConfigComponent }, // Route pour la page de configuration avec le nom du site en paramètre
   { path: '', redirectTo: '/sites', pathMatch: 'full' },
   { path: '**', redirectTo: '/sites', pathMatch: 'full' }, // Gestion de la route par défaut
+  
 ];
 
 

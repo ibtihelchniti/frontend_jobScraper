@@ -9,6 +9,7 @@
         <!-- En-tête du tableau -->
         <thead>
             <tr>
+                <th>Id</th>
                 <th>Nom du site</th>
                 <th>Url</th>
                 <th>Date du dernier Scraping</th>
@@ -19,6 +20,10 @@
         <tbody>
             <!-- Boucle sur chaque site dans la liste "sites" -->
             <tr *ngFor="let site of sites">
+
+                <!-- Colonne pour l'id du site -->
+                <td>{{ site.id }}</td>
+
                 <!-- Colonne pour le nom du site -->
                 <td>{{ site.name }}</td>
 
@@ -41,7 +46,7 @@
                 <td>
                     <div class="site-controls">
                         <!-- Bouton pour démarrer ou arrêter le scraping -->
-                        <button [disabled]="site.isScraping || site.isExportingCSV" (click)="toggleScraping(site)">
+                        <button [disabled]="site.isScraping " (click)="toggleScraping(site)">
                             <ng-container *ngIf="site.isScraping; else startScraping">
                                 <i class="fas fa-spinner fa-spin"></i> Scraping en cours...
                             </ng-container>

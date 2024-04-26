@@ -7,6 +7,7 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
 import { SiteListComponent } from './site-list/site-list.component';
 import { ConfigComponent } from './config/config.component';
 import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { FormsModule } from '@angular/forms';
   ],
   providers: [
     provideHttpClient(withFetch()),
+    DatePipe
 
   ],
   bootstrap: [AppComponent]

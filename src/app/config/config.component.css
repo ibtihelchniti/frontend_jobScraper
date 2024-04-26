@@ -1,0 +1,56 @@
+/* Style général du formulaire */
+form {
+    width: 50%;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+/* Style des labels */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* Style des champs de texte */
+input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Style du bouton de soumission */
+button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Style du bouton de soumission au survol */
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60vh; /* Hauteur de l'écran */
+  }
+  
+.site-form {
+    width: 900px; /* Largeur du formulaire */
+    padding: 50px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+  

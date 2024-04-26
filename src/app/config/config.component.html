@@ -1,9 +1,15 @@
-<form (ngSubmit)="updateSiteDetails()">
-    <label for="siteName">Site Name:</label>
-    <input type="text" id="siteName" [(ngModel)]="siteName" name="siteName">
+<div class="form-container">
+    <form (ngSubmit)="updateSiteDetails()" class="site-form">
+      <label for="siteId">Site ID:</label>
+      <input type="text" id="siteId" [(ngModel)]="siteId" name="siteId" disabled>
+    
+      <label for="siteName">Site Name:</label>
+      <input type="text" id="siteName" [(ngModel)]="siteName" name="siteName">
+    
+      <label for="siteUrl">Site URL:</label>
+      <input type="text" id="siteUrl" [(ngModel)]="siteUrl" name="siteUrl">
+    
+      <button type="submit">Update</button>
+    </form>
+</div>
   
-    <label for="siteUrl">Site URL:</label>
-    <input type="text" id="siteUrl" [(ngModel)]="siteUrl" name="siteUrl">
-  
-    <button type="submit">Update</button>
-</form>

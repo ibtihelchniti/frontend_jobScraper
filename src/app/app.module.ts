@@ -8,12 +8,14 @@ import { SiteListComponent } from './site-list/site-list.component';
 import { ConfigComponent } from './config/config.component';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SiteListComponent,
-    ConfigComponent
+    ConfigComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,

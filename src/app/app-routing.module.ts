@@ -2,11 +2,12 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SiteListComponent } from './site-list/site-list.component';
 import { ConfigComponent } from './config/config.component';
-
+import { LoginComponent } from './login/login.component';
 
 const routes: Routes = [
   { path: 'sites', component: SiteListComponent },
   { path: 'config/:siteId', component: ConfigComponent }, // Route pour la page de configuration avec le nom du site en paramètre
+  { path: 'login', component: LoginComponent },
   { path: '', redirectTo: '/sites', pathMatch: 'full' },
   { path: '**', redirectTo: '/sites', pathMatch: 'full' }, // Gestion de la route par défaut
   

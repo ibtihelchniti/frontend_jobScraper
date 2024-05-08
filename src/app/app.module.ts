@@ -10,7 +10,6 @@ import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { LoginComponent } from './login/login.component';
 import { NavigateComponent } from './navigate/navigate.component';
-import { ScrapingDetailsComponent } from './scraping-details/scraping-details.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +18,6 @@ import { ScrapingDetailsComponent } from './scraping-details/scraping-details.co
     ConfigComponent,
     LoginComponent,
     NavigateComponent,
-    ScrapingDetailsComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,65 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
+
+/* Navbar styles */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: transparent;
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo styles */
+.navbar-brand img {
+    max-height: 40px; /* Ajustez la taille selon vos besoins */
+}
+
+/* Account section styles */
+.navbar-account {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-account span {
+    margin-right: 10px;
+}
+
+/* User icon styles */
+.user-icon {
+    position: relative;
+    cursor: pointer;
+}
+
+.user-icon i {
+    font-size: 24px;
+    color: #333; /* Couleur de l'icône */
+}
+
+/* Submenu styles */
+.submenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.user-icon:hover .submenu {
+    display: block;
+}
+
+/* Logout link styles */
+.submenu a {
+    display: block;
+    padding: 8px 12px;
+    color: #007bff; /* Couleur du lien */
+    text-decoration: none;
+    transition: color 0.3s ease; /* Transition de couleur */
+}
+
+.submenu a:hover {
+    color: #0056b3; /* Couleur du lien au survol */
+}

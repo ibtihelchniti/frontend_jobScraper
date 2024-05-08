@@ -41,5 +41,5 @@ export class ScrapingService {
   updateSiteDetails(siteId: number, newName: string, newUrl: string): Observable<any> {
     return this.http.put(`${this.apiUrl}/site-details/${siteId}`, { name: newName, url: newUrl });
   }
-  
+
 }

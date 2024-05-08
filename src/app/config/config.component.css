@@ -26,18 +26,22 @@ input[type="text"] {
 
 /* Style du bouton de soumission */
 button[type="submit"] {
-    background-color: #4CAF50;
+    background-color: #7ed957;
     color: white;
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    display: flex;
+    justify-content: center
+    
 }
 
 /* Style du bouton de soumission au survol */
 button[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: #2b9b31;
+
 }
 
 .form-container {

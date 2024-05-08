@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from './authentication.service';
+import { AuthenticationService } from '../authentication.service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  selector: 'app-navigate',
+  templateUrl: './navigate.component.html',
+  styleUrls: ['./navigate.component.css'] // Corrected property name
 })
-export class AppComponent implements OnInit {
-  isAuthenticated: boolean = false; // Ajouter une variable pour suivre l'état de l'authentification
+export class NavigateComponent implements OnInit {
+  isAuthenticated: boolean = false; 
+  showSubMenu: boolean = false;
 
   constructor(public authService: AuthenticationService, private router: Router) {}
 
@@ -24,11 +25,9 @@ export class AppComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
-}
+  }
 
   getUsername(): string {
     return this.authService.getUsername();
   }
-
-  
 }

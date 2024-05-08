@@ -9,13 +9,17 @@ import { ConfigComponent } from './config/config.component';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { LoginComponent } from './login/login.component';
+import { NavigateComponent } from './navigate/navigate.component';
+import { ScrapingDetailsComponent } from './scraping-details/scraping-details.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SiteListComponent,
     ConfigComponent,
-    LoginComponent
+    LoginComponent,
+    NavigateComponent,
+    ScrapingDetailsComponent
   ],
   imports: [
     BrowserModule,

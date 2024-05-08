@@ -1,0 +1,19 @@
+<header>
+    <nav class="navbar">
+        
+        <div class="navbar-brand">
+            <img src="../../assets/elzei_logo.png" alt="Logo de l'application">
+        </div>
+
+        <div class="navbar-account">
+            <span *ngIf="authService.isAuthenticatedUser()">Bonjour, {{ getUsername() }}!</span>
+            <div class="user-icon" (mouseenter)="showSubMenu = true" (mouseleave)="showSubMenu = false">
+                <i class="fas fa-user"></i>
+                <div class="submenu" *ngIf="showSubMenu">
+                    <a href="#" (click)="logout()">Déconnexion</a>
+                </div>
+            </div>
+        </div>
+      
+    </nav>
+</header>

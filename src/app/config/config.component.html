@@ -1,4 +1,6 @@
-<div class="form-container">
+<app-navigate></app-navigate>
+<body>
+  <div class="form-container">
     <form (ngSubmit)="updateSiteDetails()" class="site-form">
       <label for="siteId">Site ID:</label>
       <input type="text" id="siteId" [(ngModel)]="siteId" name="siteId" disabled>
@@ -13,3 +15,5 @@
     </form>
 </div>
   
+  
+</body>

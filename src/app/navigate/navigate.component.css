@@ -55,11 +55,11 @@
 .submenu a {
     display: block;
     padding: 8px 12px;
-    color: #007bff; /* Couleur du lien */
+    color: #7ed957; /* Couleur du lien */
     text-decoration: none;
     transition: color 0.3s ease; /* Transition de couleur */
 }
 
 .submenu a:hover {
-    color: #0056b3; /* Couleur du lien au survol */
+    color: #428d22; /* Couleur du lien au survol */
 }

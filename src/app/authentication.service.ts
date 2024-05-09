@@ -72,22 +72,19 @@ export class AuthenticationService {
         this.router.navigate(['/login']);
       },
       (error: HttpErrorResponse) => { 
-        console.error('Erreur lors de la déconnexion', error);
         if (error.status === 401) {
-          alert('Erreur lors de la déconnexion : Vous n\'êtes pas authentifié.');
+          console.error('Erreur lors de la déconnexion : Vous n\'êtes pas authentifié.');
         } else {
-          alert('Erreur lors de la déconnexion : ' + error.message);
+          console.error('Erreur lors de la déconnexion : ' + error.message);
         }
+        this.isAuthenticated = false; // Mettre à jour l'état de l'authentification
+        this.router.navigate(['/login']);
       }
     );
-    // Mettre à jour la variable isAuthenticated
-    this.isAuthenticated = false;
     // Supprimer les informations d'authentification du localStorage lors de la déconnexion
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('username');
   }
-
-
 
 
   getUsername(): string {

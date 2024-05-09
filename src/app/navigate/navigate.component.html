@@ -8,7 +8,7 @@
         <div class="navbar-account">
             <span *ngIf="authService.isAuthenticatedUser()">Bonjour, {{ getUsername() }}!</span>
             <div class="user-icon" (mouseenter)="showSubMenu = true" (mouseleave)="showSubMenu = false">
-                <i class="fas fa-user"></i>
+                <i class='far fa-user-circle' style='font-size:24px' ></i>
                 <div class="submenu" *ngIf="showSubMenu">
                     <a href="#" (click)="logout()">Déconnexion</a>
                 </div>

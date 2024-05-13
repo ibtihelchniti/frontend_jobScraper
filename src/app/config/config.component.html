@@ -2,16 +2,16 @@
 <body>
   <div class="form-container">
     <form (ngSubmit)="updateSiteDetails()" class="site-form">
-      <label for="siteId">Site ID:</label>
+      <label for="siteId">Id:</label>
       <input type="text" id="siteId" [(ngModel)]="siteId" name="siteId" disabled>
     
-      <label for="siteName">Site Name:</label>
+      <label for="siteName">Nom du site:</label>
       <input type="text" id="siteName" [(ngModel)]="siteName" name="siteName">
     
-      <label for="siteUrl">Site URL:</label>
+      <label for="siteUrl">Url:</label>
       <input type="text" id="siteUrl" [(ngModel)]="siteUrl" name="siteUrl">
     
-      <button type="submit">Update</button>
+      <button type="submit">Mise à jour</button>
     </form>
 </div>
   

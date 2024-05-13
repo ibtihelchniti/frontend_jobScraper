@@ -131,6 +131,10 @@ h1{
     border: none;
     border-radius: 5px;
     font-size: 16px;
+    font-family: 'Heebo', sans-serif;
+    border: 1px solid #deeaff
+    
+    
 }
 
 .site-controls button:hover {

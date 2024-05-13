@@ -1,3 +1,6 @@
+@import "@fortawesome/fontawesome-free/css/all.css";
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&amp;display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Heebo&amp;display=swap");
 
 h1
  {
@@ -24,7 +27,6 @@ th {
     text-align: inherit
 }
 
-
 h1,
 .h1 {
     margin-bottom: .5rem;
@@ -37,8 +39,6 @@ h1,
     font-size: 2.488rem
 }
 
-
-
 .table {
     width: 100%;
     margin-bottom: 2rem;
@@ -47,13 +47,10 @@ h1,
 
 .table th,
 .table td {
-    padding: .90rem;
+    padding: .75rem;
     vertical-align: top;
-    border-top: 2px solid #deeaff
+    border-top: 1px solid #deeaff
 }
-
-
-
 
 .table-bordered {
     border: 1px solid #deeaff
@@ -63,9 +60,6 @@ h1,
 .table-bordered td {
     border: 1px solid #deeaff
 }
-
-
-
 
 .table-responsive {
     display: block;
@@ -78,8 +72,6 @@ h1,
     border: 0
 }
 
-
-
 .table {
     border: 1px solid rgba(71, 136, 255, 0.4);
     border-radius: 4px;
@@ -87,14 +79,9 @@ h1,
     color: #303030
 }
 
-
-
 .table-striped tbody tr:nth-of-type(odd) {
     background-color: #f7f9ff
 }
-
-
-
 
 h1 {
     font-family: "Heebo", sans-serif;
@@ -104,34 +91,38 @@ h1 {
     font-size: 2.488rem
 }
 
-
 .site-list-container {
     margin-top: 20px;
-  }
+}
   
-  .site-list {
+.site-list {
     list-style-type: none;
     padding: 0;
-  }
+}
   
-  .site-item {
+.site-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #ccc;
     padding: 10px;
-  }
+}
   
-  .site-name {
+.site-name {
     font-weight: bold;
-  }
+}
   
-  .site-controls {
+.site-controls {
     display: flex;
     align-items: center;
-  }
+}
   
-  .site-controls button {
+
+h1{
+    text-align: center
+}
+
+.site-controls button {
     margin-left: 10px;
     cursor: pointer;
     padding: 5px 10px;
@@ -139,20 +130,9 @@ h1 {
     color: #fff;
     border: none;
     border-radius: 5px;
-  }
-  
-  .site-controls button:hover {
+    font-size: 16px;
+}
+
+.site-controls button:hover {
     background-color: #6fc04c;
-  }
-
-  h1{
-    text-align: center
-  }
-
-
-
-
-
-
-
-
+}

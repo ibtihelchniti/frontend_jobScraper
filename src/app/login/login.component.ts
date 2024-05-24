@@ -12,6 +12,7 @@ export class LoginComponent implements OnInit {
   password: string = '';
   isAuthenticated: boolean = false;
   returnUrl: string = '';
+  errorMessage: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -31,10 +32,18 @@ export class LoginComponent implements OnInit {
       },
       (error) => {
         console.error('Erreur de login', error);
-        alert('Erreur de login : ' + error.message);
+        if (error.error instanceof ErrorEvent) {
+          // Gérer les erreurs réseau
+          this.errorMessage = 'Erreur réseau: Veuillez réessayer plus tard.';
+        } else {
+          // Gérer les erreurs de réponse non JSON
+          this.errorMessage = 'Erreur de login: Nom d\'utilisateur ou mot de passe incorrect.';
+        }
+        alert(this.errorMessage); // Afficher l'alerte avec le message d'erreur
       }
     );
   }
+
   logout(): void {
     this.authService.logout(); // Appeler la méthode de déconnexion du service d'authentification
     this.router.navigate(['/login']); // Rediriger vers la page de connexion

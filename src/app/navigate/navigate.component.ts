@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-navigate',
   templateUrl: './navigate.component.html',
-  styleUrls: ['./navigate.component.css'] // Corrected property name
+  styleUrls: ['./navigate.component.css'] 
 })
 export class NavigateComponent implements OnInit {
   isAuthenticated: boolean = false; 

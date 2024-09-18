@@ -1,4 +1,6 @@
 /* Global styles */
+@import "@fortawesome/fontawesome-free/css/all.css";
+
 body {
   font-family: Arial, sans-serif;
   background-color: #f8f9fa;
@@ -49,6 +51,26 @@ input[type="password"] {
   border: 1px solid #ccc;
   border-radius: 5px;
   box-sizing: border-box;
+}
+
+.password-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.password-toggle i {
+  font-size: 16px;
+  color: #333;
 }
 
 .btn-login {

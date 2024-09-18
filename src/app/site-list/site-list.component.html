@@ -1,57 +1,48 @@
 <app-navigate></app-navigate>
 
-
 <!-- Titre de la page -->
 <br><br><br>
 <h1>Liste des Sites</h1>
 <br><br><br>
 
-<!-- Tableau pour afficher les sites -->
-<div class="table-responsive">
-    <table id="datatable" class="table data-table table-striped table-bordered">
+<!-- Vérification s'il y a des sites disponibles -->
+<div *ngIf="sites.length === 0">
+    <p class="text-center">Aucun site disponible pour le scraping pour le moment.</p>
+</div>
+
+<!-- Tableau pour afficher les sites si disponibles -->
+<div class="table-responsive" *ngIf="sites.length > 0">
+    <table id="datatable" class="table data-table table-striped table-bordered" aria-label="Liste des sites">
         <!-- En-tête du tableau -->
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Nom du site</th>
-                <th>Url</th>
-                <th>Date du dernier Scraping</th>
-                <th>Etat du dernier Scraping</th>
-                <th>Action</th>
+                <th scope="col">Id</th>
+                <th scope="col">Nom du site</th>
+                <th scope="col">Url</th>
+                <th scope="col">Date du dernier Scraping</th>
+                <th scope="col">Etat du dernier Scraping</th>
+                <th scope="col">Action</th>
             </tr>
         </thead>
         <tbody>
             <!-- Boucle sur chaque site dans la liste "sites" -->
             <tr *ngFor="let site of sites">
-
-                <!-- Colonne pour l'id du site -->
                 <td>{{ site.id }}</td>
-
-                <!-- Colonne pour le nom du site -->
                 <td>{{ site.name }}</td>
-
-                <!-- Colonne pour l'URL du site avec lien cliquable -->
-                <td><a href="{{ site.url }}" target="_blank">{{ site.url }}</a></td>
-
-                <!-- Colonne pour la date du dernier scraping -->
+                <td><a href="{{ site.url }}" target="_blank" rel="noopener noreferrer">{{ site.url }}</a></td>
                 <td>{{ site.lastScrapingDate }}</td>
-
-                <!-- Colonne pour l'état du dernier scraping -->
                 <td>
-                    <!-- Afficher l'état du scraping réussi ou échoué -->
                     <span *ngIf="site.scrapingStatus === 'Réussi'; else failedStatus">{{ site.scrapingStatus }}</span>
                     <ng-template #failedStatus>
                         <span>{{ site.scrapingStatus }}</span>
                     </ng-template>
                 </td>
-
-                <!-- Colonne pour les actions -->
                 <td>
                     <div class="site-controls">
                         <!-- Bouton pour démarrer ou arrêter le scraping -->
-                        <button [disabled]="site.isScraping " (click)="toggleScraping(site)">
+                        <button [disabled]="site.isScraping" (click)="toggleScraping(site)">
                             <ng-container *ngIf="site.isScraping; else startScraping">
-                                <i class="fas fa-spinner fa-spin"></i> Scraping en cours...
+                                <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Scraping en cours...
                             </ng-container>
                             <ng-template #startScraping>Démarrer le Scraping</ng-template>
                         </button>
@@ -59,14 +50,14 @@
                         <!-- Bouton pour exporter les données CSV -->
                         <button [disabled]="site.isScraping || site.isExportingCSV" (click)="exportCSV(site)">
                             <ng-container *ngIf="site.isExportingCSV; else startExportCSV">
-                                <i class="fa-solid fa-file-csv fa-beat-fade"></i>
+                                <i class="fa-solid fa-file-csv fa-beat-fade" aria-hidden="true"></i>
                             </ng-container>
-                            <ng-template #startExportCSV><i class="fas fa-file-csv"></i></ng-template>
+                            <ng-template #startExportCSV><i class="fas fa-file-csv" aria-hidden="true"></i></ng-template>
                         </button>
 
-                        <!-- lien pour la configuration  -->
+                        <!-- Bouton pour la configuration -->
                         <button (click)="openConfig(site)">
-                            <i class="fas fa-cog"></i>
+                            <i class="fas fa-cog" aria-hidden="true"></i>
                         </button>
                     </div>
                 </td>

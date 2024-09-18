@@ -13,6 +13,7 @@ export class LoginComponent implements OnInit {
   isAuthenticated: boolean = false;
   returnUrl: string = '';
   errorMessage: string = '';
+  passwordVisible: boolean = false; // Gérer la visibilité du mot de passe
 
   constructor(
     private route: ActivatedRoute,
@@ -21,36 +22,32 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Récupérer le paramètre de redirection après un rafraîchissement
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/sites';
   }
 
   login(): void {
     this.authService.login(this.username, this.password).subscribe(
       () => {
-        this.router.navigateByUrl(this.returnUrl); // Rediriger vers l'URL précédente après l'authentification
+        this.router.navigateByUrl(this.returnUrl);
       },
       (error) => {
         console.error('Erreur de login', error);
-        if (error.error instanceof ErrorEvent) {
-          // Gérer les erreurs réseau
-          this.errorMessage = 'Erreur réseau: Veuillez réessayer plus tard.';
-        } else {
-          // Gérer les erreurs de réponse non JSON
-          this.errorMessage = 'Erreur de login: Nom d\'utilisateur ou mot de passe incorrect.';
-        }
-        alert(this.errorMessage); // Afficher l'alerte avec le message d'erreur
+        this.errorMessage = error.error instanceof ErrorEvent
+          ? 'Erreur réseau: Veuillez réessayer plus tard.'
+          : 'Erreur de login: Nom d\'utilisateur ou mot de passe incorrect.';
+        alert(this.errorMessage);
       }
     );
   }
 
   logout(): void {
-    this.authService.logout(); // Appeler la méthode de déconnexion du service d'authentification
-    this.router.navigate(['/login']); // Rediriger vers la page de connexion
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
-  // Méthode pour récupérer le nom d'utilisateur actuellement connecté
-  getUsername(): string {
-    return this.authService.getUsername();
+  // Méthode pour afficher/masquer le mot de passe
+  togglePasswordVisibility(): void {
+    this.passwordVisible = !this.passwordVisible;
   }
 }
+
